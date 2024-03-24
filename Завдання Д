@@ -1,0 +1,101 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+
+public class Program
+{
+    private static HashSet<int> unionSet = new HashSet<int>(); // Множина для об'єднання
+
+    public static void Main(string[] args)
+    {
+        // Створення нової форми
+        Form form = new Form();
+
+        // Створення текстового поля для виведення результатів
+        TextBox textBox = new TextBox();
+        textBox.Multiline = true;
+        textBox.Dock = DockStyle.Fill;
+        form.Controls.Add(textBox);
+
+        // Запит у користувача на введення множин
+        textBox.AppendText("Введіть множини. Для завершення введення натисніть Enter.\n");
+
+        // Введення множин та об'єднання
+        textBox.KeyDown += (sender, e) =>
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true; // Відключення звуку натискання клавіші Enter
+                string input = textBox.Text.Trim();
+
+                if (string.IsNullOrEmpty(input))
+                    return;
+
+                string[] elements = input.Split(' ');
+
+                HashSet<int> set = new HashSet<int>();
+                foreach (string element in elements)
+                {
+                    if (int.TryParse(element, out int number))
+                    {
+                        set.Add(number);
+                    }
+                }
+
+                unionSet.UnionWith(set);
+
+                // Очищення текстового поля
+                textBox.Clear();
+
+                // Вивід результату
+                textBox.AppendText("Об'єднання множин:\n");
+                foreach (int element in unionSet)
+                {
+                    textBox.AppendText(element.ToString() + "\n");
+                }
+
+                // Перевірка підмножини (надмножини)
+                CheckSubsetSuperset(textBox, set, unionSet);
+            }
+        };
+
+        // Обробник події закриття форми
+        form.FormClosing += (sender, e) =>
+        {
+            Application.Exit(); // Закриття програми при закритті форми
+        };
+
+        // Відображення форми
+        Application.Run(form);
+    }
+
+    private static void CheckSubsetSuperset(TextBox textBox, HashSet<int> set1, HashSet<int> set2)
+    {
+        if (set1.Count == 0 || set2.Count == 0)
+        {
+            textBox.AppendText("Множини порожні.\n");
+            return;
+        }
+
+        bool isSubset = set1.IsSubsetOf(set2);
+        bool isSuperset = set1.IsSupersetOf(set2);
+
+        if (isSubset && isSuperset)
+        {
+            textBox.AppendText("Перша множина є підмножиною та надмножиною другої множини.\n");
+        }
+        else if (isSubset)
+        {
+            textBox.AppendText("Перша множина є підмножиною другої множини.\n");
+        }
+        else if (isSuperset)
+        {
+            textBox.AppendText("Перша множина є надмножиною другої множини.\n");
+        }
+        else
+        {
+            textBox.AppendText("Перша множина не є підмножиною та надмножиною другої множини.\n");
+        }
+    }
+}
