@@ -1,0 +1,102 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+
+public class Program
+{
+    private static List<HashSet<int>> sets = new List<HashSet<int>>();
+
+    public static void Main(string[] args)
+    {
+        Form form = new Form();
+
+        TextBox textBox = new TextBox();
+        textBox.Multiline = true;
+        textBox.Dock = DockStyle.Fill;
+        form.Controls.Add(textBox);
+
+        textBox.AppendText("Введіть множини. Для завершення введення натисніть Enter.\n");
+
+        textBox.KeyDown += (sender, e) =>
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.SuppressKeyPress = true;
+                string input = textBox.Text.Trim();
+
+                if (string.IsNullOrEmpty(input))
+                    return;
+
+                string[] lines = input.Split('\n');
+                foreach (string line in lines)
+                {
+                    string[] elements = line.Split(' ');
+
+                    HashSet<int> set = new HashSet<int>();
+                    foreach (string element in elements)
+                    {
+                        if (int.TryParse(element, out int number))
+                        {
+                            set.Add(number);
+                        }
+                    }
+
+                    if (set.Count > 0)
+                    {
+                        sets.Add(set);
+                    }
+                }
+
+                textBox.Clear();
+
+                textBox.AppendText("Масив множин:\n");
+                for (int i = 0; i < sets.Count; i++)
+                {
+                    textBox.AppendText($"Множина {i + 1}: ");
+                    foreach (int element in sets[i])
+                    {
+                        textBox.AppendText(element.ToString() + " ");
+                    }
+                    textBox.AppendText("\n");
+                }
+
+                PerformIntersection(textBox);
+            }
+        };
+
+        form.FormClosing += (sender, e) =>
+        {
+            Application.Exit(); 
+        };
+
+        Application.Run(form);
+    }
+
+    private static void PerformIntersection(TextBox textBox)
+    {
+        if (sets.Count == 0)
+            return;
+
+        HashSet<int> result = new HashSet<int>(sets[0]);
+        for (int i = 1; i < sets.Count; i++)
+        {
+            result.IntersectWith(sets[i]);
+
+            // Перевірка кількості елементів у результаті перетинання
+            if (result.Count > 255)
+            {
+                MessageBox.Show("Перетинання множин містить більше 255 елементів.");
+                return;
+            }
+        }
+
+        string intersectionResult = "Результат перетинання множин:\n";
+        foreach (int element in result)
+        {
+            intersectionResult += element.ToString() + " ";
+        }
+
+        MessageBox.Show(intersectionResult);
+    }
+}
