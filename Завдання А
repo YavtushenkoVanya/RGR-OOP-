@@ -1,0 +1,64 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+
+public class Program
+{
+    private static HashSet<int> unionSet = new HashSet<int>(); // Множина для об'єднання
+    public static void Main(string[] args)
+    {
+        // Створення нової форми
+        Form form = new Form();
+
+        // Створення текстового поля для введення множин
+        TextBox inputTextBox = new TextBox();
+        inputTextBox.Dock = DockStyle.Top;
+        form.Controls.Add(inputTextBox);
+
+        // Створення кнопки для виконання об'єднання
+        Button unionButton = new Button();
+        unionButton.Text = "Об'єднати";
+        unionButton.Dock = DockStyle.Top;
+        form.Controls.Add(unionButton);
+
+        // Створення текстового поля для виведення результатів
+        TextBox outputTextBox = new TextBox();
+        outputTextBox.Multiline = true;
+        outputTextBox.ReadOnly = true;
+        outputTextBox.Dock = DockStyle.Fill;
+        form.Controls.Add(outputTextBox);
+        // Обробник натискання кнопки "Об'єднати"
+        unionButton.Click += (sender, e) =>
+        {
+            string input = inputTextBox.Text.Trim();
+            if (string.IsNullOrEmpty(input))
+                return;
+            string[] elements = input.Split(' ');
+            HashSet<int> set = new HashSet<int>();
+            foreach (string element in elements)
+            {
+                if (int.TryParse(element, out int number))
+                {
+                    set.Add(number);
+                }
+            }
+            unionSet.UnionWith(set);
+            // Очищення текстового поля вводу
+            inputTextBox.Clear();
+            // Вивід результату
+            outputTextBox.AppendText("Об'єднання множин:\n");
+            foreach (int element in unionSet)
+            {
+                outputTextBox.AppendText(element.ToString() + "\n");
+            }
+        };
+        // Додавання 255 елементів до множини
+        for (int i = 0; i < 255; i++)
+        {
+            unionSet.Add(i);
+        }
+        // Відображення форми
+        Application.Run(form);
+    }
+}
